@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations From The Last 6 Months</title>
+    <style>
+        body {
+            background-color: #191414;
+            color: #FFFFFF;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1DB954;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1DB954;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .playlist-message {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #1DB954;
+        }
+    </style>
+</head>
+<body>
+    <h1><title>Recommendations From The Last 6 Months</title></h1>
+
+    <!-- Display message to check Spotify for the new playlist -->
+    <div class="playlist-message">
+        Check your Spotify for your new playlist!
+    </div>
+
+    <!-- Display track information from the track_info_list -->
+    {% for track_info in track_info_list %}
+        <p>{{ track_info['top_track_name'] }} by {{ track_info['top_track_artist'] }} - Recommended: {{ track_info['recommended_track_name'] }} by {{ track_info['recommended_track_artist'] }}</p>
+    {% endfor %}
+
+    <!-- Back button -->
+    <a href="/" class="back-button">Back to Home</a>
+
+    <!-- Add more content or links as necessary -->
+</body>
+</html>

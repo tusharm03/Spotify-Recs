@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Recommender</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1A1A1A;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #1DB954;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+            color: #1A1A1A;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        p {
+            font-size: 1.5em;
+            line-height: 1.6;
+            color: #1A1A1A;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .feature {
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .feature-icon {
+            width: 80px; /* Adjust the size as needed */
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #1DB954;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature p {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .feature:hover .feature-icon {
+            transform: scale(1.1);
+            border-color: #158843;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column; /* Arrange buttons vertically */
+            align-items: center; /* Center buttons horizontally */
+        }
+
+        .button {
+            background-color: #1DB954;
+            color: #fff;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 100px; /* Add margin to create space between buttons */
+        }
+
+        .button:hover {
+            background-color: #158843;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: #333;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        a {
+            color: #1DB954;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+
+        footer {
+            background-color: #1DB954;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.8em;
+            color: #fff;
+        }
+        .features {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: -30px; /* Adjusted margin-top */
+        }
+
+        .feature {
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .input-container {
+            margin-top: 20px; /* Adjusted margin-top */
+        }
+
+        label {
+            display: block;
+            font-size: 1.2em;
+            color: #1DB954; /* Spotify green color */
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #1DB954; /* Spotify green color */
+            border-radius: 5px;
+            background-color: #1A1A1A; /* Dark background color */
+            color: #FFFFFF; /* White text color */
+            font-size: 1em;
+            margin-top: 5px;
+        }
+
+
+    </style>
+    <!-- Add any additional styles or scripts here -->
+</head>
+<body>
+    <header>
+        <h1>🎵 Spotify Recommender 🎵</h1>
+        <div class="about-section">
+            <p>
+                Welcome to Spotify Recommender, your personalized gateway to an enriched music experience. Our platform empowers you to explore curated playlists and receive recommendations tailored to your musical preferences. 
+                Whether you're seeking the latest hits or hidden gems, Spotify Recommender is your companion for discovering tracks that resonate with your unique taste. 
+                Elevate your music journey with us, and let the rhythm of personalized recommendations guide you to new and exciting soundscapes.
+            </p>
+        </div>
+    </header>
+    <main>
+        <p>Discover new tracks based on your preferences and elevate your music experience!</p>
+    
+        <form action="{{ url_for('home') }}" method="post" onsubmit="return validateForm()">
+            <div class="features">
+                <div class="feature">
+                    <div class="input-container">
+                        <label for="playlist-name">Playlist Name:</label>
+                        <input type="text" id="playlist-name" name="playlist_name" placeholder="Enter playlist name" required>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="input-container">
+                        <label for="num-songs">Number of Songs:</label>
+                        <input type="number" id="num-songs" name="num_songs" placeholder="Enter number of songs" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="button" name="time_range" value="week">Recommendations for the Week</button>
+            <button type="submit" class="button" name="time_range" value="month">Recommendations for the Month</button>
+            <button type="submit" class="button" name="time_range" value="year">Recommendations for the Year</button>
+        </form>
+    
+        <div class="card-container">
+            <!-- Card content as before -->
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Spotify Recommender. All rights reserved.</p>
+    </footer>
+    
+    <script>
+    function validateForm() {
+        var playlistName = document.getElementById('playlist-name').value;
+        var numSongs = document.getElementById('num-songs').value;
+
+        if (playlistName.trim() === '' || numSongs.trim() === '') {
+            alert('Please fill in both fields.');
+            return false;
+        }
+
+        if (isNaN(numSongs) || parseInt(numSongs) <= 0) {
+            alert('Please enter a valid number of songs.');
+            return false;
+        }
+
+        alert('Please wait patiently while we create your playlist :)'); // Display "please wait" message
+
+        return true;
+    }
+    </script>
+
+</body>
+</html>

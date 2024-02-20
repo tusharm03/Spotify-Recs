@@ -21,7 +21,7 @@ redirect_uri = os.getenv("REDIRECT_URI")  # Set in your Spotify Developer Dashbo
 
 
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_sec, redirect_uri=redirect_uri, scope="user-library-read user-top-read playlist-modify-public playlist-modify-private user-read-private ", cache_path=".spotify_cache", show_dialog=False))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_sec, redirect_uri=redirect_uri, scope="user-library-read user-top-read playlist-modify-public playlist-modify-private user-read-private ", cache_path=".spotify_cache", show_dialog=True))
 
 def create_playlist(playlist_name, is_public=True, description=''):
     try:
@@ -98,6 +98,9 @@ def add_recommendations(time_range, playlist_name, num_songs):
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
+    print(client_id)
+    print(client_sec)
+    print(redirect_uri)
     if request.method == 'POST':
         playlist_name = request.form['playlist_name']
         num_songs = request.form['num_songs']

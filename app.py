@@ -134,18 +134,6 @@ def home():
 
     return render_template('home.html')
 
-@app.route('/callback')
-def callback():
-    print('Callback route accessed')
-    code = request.args['code']
-    token_info = sp.auth_manager.get_access_token(code, as_dict=True)
-
-    # Store the access token in the session or wherever you need it
-    session['access_token'] = token_info['access_token']
-
-    # Redirect to the 'home' route or any other route as needed
-    return redirect(url_for('home'))
-
 
 
 

@@ -16,7 +16,9 @@ load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_sec = os.getenv("CLIENT_SEC")
 
-redirect_uri = os.getenv("REDIRECT_URI")  # Set in your Spotify Developer Dashboard
+# Set in your Spotify Developer Dashboard
+redirect_uri = os.getenv("REDIRECT_URI", "http://localhost:5000/callback")
+  
 
 
 
@@ -135,9 +137,15 @@ def home():
 @app.route('/callback')
 def callback():
     print('Callback route accessed')
-    print('Authorization code:', request.args['code'])
-    sp.auth_manager.get_access_token(request.args['code'], as_dict=False)
+    code = request.args['code']
+    token_info = sp.auth_manager.get_access_token(code, as_dict=True)
+
+    # Store the access token in the session or wherever you need it
+    session['access_token'] = token_info['access_token']
+
+    # Redirect to the 'home' route or any other route as needed
     return redirect(url_for('home'))
+
 
 
 

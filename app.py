@@ -96,17 +96,40 @@ def add_recommendations(time_range, playlist_name, num_songs):
 
 
 
+# New route for login
+@app.route("/login")
+def login():
+    # Redirect the user to the Spotify login page
+    return redirect(sp.auth_manager.get_authorize_url())
 
+# Callback route after the user authorizes the app on Spotify
+@app.route('/callback')
+def callback():
+    code = request.args['code']
+    token_info = sp.auth_manager.get_access_token(code, as_dict=True)
 
+    # Store relevant information in the session
+    session['access_token'] = token_info['access_token']
+    session['user_id'] = sp.me()['id']
+
+    # Redirect to the main page or dashboard
+    return redirect(url_for('home'))
+
+# Route for the main page
 @app.route("/", methods=['GET', 'POST'])
 def home():
+    if not ('access_token' in session and 'user_id' in session):
+        # Redirect to the login page if not authenticated
+        return redirect(url_for('login'))
+
     print(client_id)
     print(client_sec)
     print(redirect_uri)
+
     if request.method == 'POST':
         playlist_name = request.form['playlist_name']
         num_songs = request.form['num_songs']
-        
+
         # Retrieve the value of the clicked button
         time_range = request.form.get('time_range')
 
@@ -166,6 +189,5 @@ def all_time():
     return add_recommendations('long_term', playlist_name, num_songs)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=int(os.environ.get("PORT", 5000)))
-
+    app.run(debug=True)
     

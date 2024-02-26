@@ -16,7 +16,9 @@ load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_sec = os.getenv("CLIENT_SEC")
 
-redirect_uri = os.getenv("REDIRECT_URI")  # Set in your Spotify Developer Dashboard
+# Set in your Spotify Developer Dashboard
+redirect_uri = os.getenv("REDIRECT_URI")
+  
 
 
 
@@ -92,19 +94,49 @@ def add_recommendations(time_range, playlist_name, num_songs):
         return render_template(f'{time_range}.html', track_info_list=track_info_list)
     
 
+def authenticated():
+    return 'access_token' in session and 'user_id' in session
+
+# New route for login
+@app.route("/login")
+def login():
+    # Clear the cache before proceeding
+    cache_path = ".spotify_cache"
+    if os.path.exists(cache_path):
+        os.remove(cache_path)
+        return render_template('login.html')
+    # Redirect the user to the Spotify login page
+    return redirect(sp.auth_manager.get_authorize_url())
+
+# Callback route after the user authorizes the app on Spotify
+@app.route('/callback')
+def callback():
+    code = request.args['code']
+    token_info = sp.auth_manager.get_access_token(code, as_dict=True)
+
+    # Store relevant information in the session
+    session['access_token'] = token_info['access_token']
+    session['user_id'] = sp.me()['id']
+
+    # Redirect to the main page or dashboard
+    return redirect(url_for('home'))
 
 
-
-
+# Route for the main page
 @app.route("/", methods=['GET', 'POST'])
 def home():
+    if not ('access_token' in session and 'user_id' in session):
+        # Redirect to the login page if not authenticated
+        return render_template('login.html')
+
     print(client_id)
     print(client_sec)
     print(redirect_uri)
+
     if request.method == 'POST':
         playlist_name = request.form['playlist_name']
         num_songs = request.form['num_songs']
-        
+
         # Retrieve the value of the clicked button
         time_range = request.form.get('time_range')
 
@@ -132,12 +164,6 @@ def home():
 
     return render_template('home.html')
 
-@app.route('/callback')
-def callback():
-    print('Callback route accessed')
-    print('Authorization code:', request.args['code'])
-    sp.auth_manager.get_access_token(request.args['code'], as_dict=False)
-    return redirect(url_for('home'))
 
 
 

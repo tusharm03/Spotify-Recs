@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Recommender</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1A1A1A;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #1DB954;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+            color: #1A1A1A;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .welcome-message {
+            font-size: 25px; /* Adjusted font size */
+            font-weight: bold; /* Added bold style */
+            line-height: 1.6;
+            color: #1A1A1A; /* Light color for the welcome message */
+        }
+
+        .login-message {
+            font-size: 30px;
+            line-height: 1.6;
+            color: #1DB954; /* Distinct color for the login message */
+            margin-top: 70px; /* Adjusted margin-top */
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column; /* Arrange buttons vertically */
+            align-items: center; /* Center buttons horizontally */
+            margin-top: 20px; /* Adjusted margin-top */
+        }
+
+        .button {
+            background-color: #1DB954;
+            color: #fff;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Add margin to create space between message and button */
+        }
+
+        .button:hover {
+            background-color: #158843;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎵 Spotify Recommender 🎵</h1>
+        <div class="about-section">
+            <p class="welcome-message">
+                Welcome to Spotify Recommender, your personalized gateway to an enriched music experience. Our platform empowers you to explore curated playlists and receive recommendations tailored to your musical preferences. 
+                Whether you're seeking the latest hits or hidden gems, Spotify Recommender is your companion for discovering tracks that resonate with your unique taste. 
+                Elevate your music journey with us, and let the rhythm of personalized recommendations guide you to new and exciting soundscapes.
+            </p>
+        </div>
+    </header>
+    <main>
+        <p class="login-message">Please kindly log in to get personalized recommendations.</p>
+        <form action="{{ url_for('login') }}" method="get">
+            <button type="submit" class="button">Log In</button>
+        </form>
+    </main>
+</body>
+</html>

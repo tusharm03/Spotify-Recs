@@ -170,6 +170,27 @@
             margin-top: 5px;
         }
 
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logout-button button {
+            background-color: #1DB954;
+            color: #1A1A1A;
+            padding: 15px 20px; /* Adjusted padding for a larger button */
+            border: none;
+            border-radius: 8px; /* Increased border-radius for rounded corners */
+            font-size: 1.2em; /* Slightly increased font size */
+            cursor: pointer;
+        transition: background-color 0.3s ease;
+        }
+
+        .logout-button button:hover {
+            background-color: #158843;
+        }
+
 
     </style>
     <!-- Add any additional styles or scripts here -->
@@ -183,6 +204,10 @@
                 Whether you're seeking the latest hits or hidden gems, Spotify Recommender is your companion for discovering tracks that resonate with your unique taste. 
                 Elevate your music journey with us, and let the rhythm of personalized recommendations guide you to new and exciting soundscapes.
             </p>
+        </div>
+        <!-- Existing content... -->
+        <div class="logout-button">
+            <button onclick="logout()">Logout</button>
         </div>
     </header>
     <main>
@@ -234,6 +259,10 @@
         alert('Please wait patiently while we create your playlist :)'); // Display "please wait" message
 
         return true;
+    }
+    function logout() {
+            // Assuming your login URL is '/login', replace it with your actual login URL
+            window.location.href = '/login';
     }
     </script>
 

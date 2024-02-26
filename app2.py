@@ -129,9 +129,9 @@ def home():
         # Redirect to the login page if not authenticated
         return render_template('login.html')
 
-    print(client_id)
-    print(client_sec)
-    print(redirect_uri)
+    # print(client_id)
+    # print(client_sec)
+    # print(redirect_uri)
 
     if request.method == 'POST':
         playlist_name = request.form['playlist_name']

@@ -47,10 +47,10 @@ def get_recommendations(track_name):
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 def add_recommendations(time_range, playlist_name, num_songs):
-        # Clear the cache before proceeding
-        cache_path = ".spotify_cache"
-        if os.path.exists(cache_path):
-            os.remove(cache_path)
+        # # Clear the cache before proceeding
+        # cache_path = ".spotify_cache"
+        # if os.path.exists(cache_path):
+        #     os.remove(cache_path)
         if time_range == 'short_term':
             time = 'Last 4 Weeks'
             playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')

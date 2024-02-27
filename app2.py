@@ -100,11 +100,6 @@ def authenticated():
 # New route for login
 @app.route("/login")
 def login():
-    # Clear the cache before proceeding
-    cache_path = ".spotify_cache"
-    if os.path.exists(cache_path):
-        os.remove(cache_path)
-        return render_template('login.html')
     # Redirect the user to the Spotify login page
     return redirect(sp.auth_manager.get_authorize_url())
 

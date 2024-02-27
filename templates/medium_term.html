@@ -38,6 +38,9 @@
             margin-top: 20px;
             color: #1DB954;
         }
+        .recommended-song {
+            color: #1DB954;
+        }
     </style>
 </head>
 <body>
@@ -50,7 +53,7 @@
 
     <!-- Display track information from the track_info_list -->
     {% for track_info in track_info_list %}
-        <p>{{ track_info['top_track_name'] }} by {{ track_info['top_track_artist'] }} - Recommended: {{ track_info['recommended_track_name'] }} by {{ track_info['recommended_track_artist'] }}</p>
+        <p>{{ track_info['top_track_name'] }} by {{ track_info['top_track_artist'] }} - <span class="recommended-song">Recommended: {{ track_info['recommended_track_name'] }} by {{ track_info['recommended_track_artist'] }}</span></p>
     {% endfor %}
 
     <!-- Back button -->

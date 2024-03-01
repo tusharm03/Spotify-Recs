@@ -125,7 +125,7 @@ def callback():
 # Route for the main page
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    if not ('access_token' in session and 'user_id' in session):
+    if not ('access_token' in session or 'user_id' in session):
         # Redirect to the login page if not authenticated
         return render_template('login.html')
 

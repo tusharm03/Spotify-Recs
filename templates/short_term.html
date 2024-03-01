@@ -41,6 +41,21 @@
         .recommended-song {
             color: #1DB954;
         }
+        .clear-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #FF0000; /* Red color for emphasis */
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .dont-like-message {
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #1DB954;
+        }
     </style>
 </head>
 <body>
@@ -56,8 +71,16 @@
         <p>{{ track_info['top_track_name'] }} by {{ track_info['top_track_artist'] }} - <span class="recommended-song">Recommended: {{ track_info['recommended_track_name'] }} by {{ track_info['recommended_track_artist'] }}</span></p>
     {% endfor %}
 
+
     <!-- Back button -->
     <a href="/" class="back-button">Back to Home</a>
+    <div class="dont-like-message">
+        Want Diffrent Songs?
+    </div>
+    <form method="post" action="/last_4_weeks" class="clear-form">
+        <input type="hidden" name="button_id" value="clearButton">
+        <button type="submit" class="clear-button">Clear Playlist and Replace Songs</button>
+    </form>
 
     <!-- Add more content or links as necessary -->
 </body>

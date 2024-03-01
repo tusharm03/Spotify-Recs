@@ -112,7 +112,7 @@ def login():
 @app.route('/callback')
 def callback():
     code = request.args['code']
-    token_info = sp.auth_manager.get_access_token(code, as_dict=True)
+    token_info = sp.auth_manager.get_access_token(code)
 
     # Store relevant information in the session
     session['access_token'] = token_info['access_token']
@@ -125,7 +125,8 @@ def callback():
 # Route for the main page
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    if not ('access_token' in session or 'user_id' in session):
+    
+    if not ('access_token' in session and 'user_id' in session):
         # Redirect to the login page if not authenticated
         return render_template('login.html')
 

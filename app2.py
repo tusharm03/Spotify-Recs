@@ -46,56 +46,39 @@ def get_recommendations(track_name):
     recommendations = sp.recommendations(seed_tracks=[track_uri])['tracks']
     return recommendations
 
-def get_recommendations(track_name):
-    results = sp.search(q=track_name, type='track')
-    track_uri = results['tracks']['items'][0]['uri']
-    recommendations = sp.recommendations(seed_tracks=[track_uri])['tracks']
-    return recommendations
-
-def process_track(track, playlist_id, time_range, track_info_list):
-    recommended_tracks = get_recommendations(track['name'])[:1]
-    track_uris = [rec_track['uri'] for rec_track in recommended_tracks]
-    add_items_to_playlist(playlist_id, track_uris)
-
-    track_info_list.append({
-        'top_track_name': track['name'],
-        'top_track_artist': track['artists'][0]['name'],
-        'recommended_track_name': recommended_tracks[0]['name'],
-        'recommended_track_artist': recommended_tracks[0]['artists'][0]['name']
-    })
-
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+def add_recommendations(time_range, playlist_name, num_songs, playlist_id=None):
+        # # Clear the cache before proceeding
+        # cache_path = ".spotify_cache"
+        # if os.path.exists(cache_path):
+        #     os.remove(cache_path)
+        if time_range == 'short_term':
+            time = 'Last 4 Weeks'
+            if playlist_id is None:
+                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
+                session['playlist_id'] = playlist_id
 
-def add_recommendations(time_range, playlist_name, num_songs, batch_size=10):
-    # Clear the cache before proceeding
-    # cache_path = ".spotify_cache"
-    # if os.path.exists(cache_path):
-    #     os.remove(cache_path)
+        elif time_range == 'medium_term':
+            time = 'Last 6 Months'
+            if playlist_id is None:
+                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
+                session['playlist_id'] = playlist_id
+        elif time_range == 'long_term':
+            time = 'All Time'
+            if playlist_id is None:
+                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music From {time}')
+                session['playlist_id'] = playlist_id
+            
 
-    if time_range == 'short_term':
-        time = 'Last 4 Weeks'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
-    elif time_range == 'medium_term':
-        time = 'Last 6 Months'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
-    elif time_range == 'long_term':
-        time = 'All Time'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music From {time}')
+        
 
-    # Render the loading page
+        user_top_tracks = sp.current_user_top_tracks(limit=num_songs, time_range=time_range)
+        
+        track_info_list = []
 
-    user_top_tracks = sp.current_user_top_tracks(limit=num_songs, time_range=time_range)
-
-    track_info_list = []
-
-    for i in range(0, num_songs, batch_size):
-        batch_of_tracks = user_top_tracks['items'][i:i + batch_size]
-        recommended_tracks_batch = []
-
-        for track in batch_of_tracks:
+        for track in user_top_tracks['items']:
             recommended_tracks = get_recommendations(track['name'])[:1]
-            recommended_tracks_batch.extend(recommended_tracks)
 
             track_uris = [rec_track['uri'] for rec_track in recommended_tracks]
             add_items_to_playlist(playlist_id, track_uris)
@@ -106,20 +89,16 @@ def add_recommendations(time_range, playlist_name, num_songs, batch_size=10):
                 'recommended_track_name': recommended_tracks[0]['name'],
                 'recommended_track_artist': recommended_tracks[0]['artists'][0]['name']
             })
+        if time_range == 'short_term':
+            # Render the short_term.html template and pass track_info_list to it
+            return render_template('short_term.html', track_info_list=track_info_list) 
+        elif time_range == 'medium_term':
+            return render_template('medium_term.html', track_info_list=track_info_list) 
+        elif time_range == 'long_term':
+            return render_template('long_term.html', track_info_list=track_info_list) 
 
-        if len(track_info_list) != i + batch_size:
-            loading_page = f'{time_range}_loading.html'
-            return render_template(loading_page)
 
-    if time_range == 'short_term':
-        # Render the short_term.html template and pass track_info_list to it
-        return render_template('short_term.html', track_info_list=track_info_list)
-    elif time_range == 'medium_term':
-        return render_template('medium_term.html', track_info_list=track_info_list)
-    elif time_range == 'long_term':
-        return render_template('long_term.html', track_info_list=track_info_list)
-
-    return render_template(f'{time_range}.html', track_info_list=track_info_list)
+        return render_template(f'{time_range}.html', track_info_list=track_info_list)
     
 
 def authenticated():

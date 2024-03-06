@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+import asyncio
+import concurrent.futures
+
+from flask import Flask, render_template, request, session, redirect, url_for, render_template_string
 
 # Import your Spotify script
-import asyncio
+
 from dotenv import load_dotenv
 import os
 import spotipy
@@ -10,7 +13,7 @@ import base64
 import requests
 from requests import post, get
 import json
-import concurrent.futures
+
 
 load_dotenv()
 
@@ -46,7 +49,10 @@ def get_recommendations(track_name):
     recommendations = sp.recommendations(seed_tracks=[track_uri])['tracks']
     return recommendations
 
-def process_track(track, playlist_id, time_range, track_info_list):
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+
+async def process_track(track, playlist_id, time_range, track_info_list):
     recommended_tracks = get_recommendations(track['name'])[:1]
     track_uris = [rec_track['uri'] for rec_track in recommended_tracks]
     add_items_to_playlist(playlist_id, track_uris)
@@ -58,62 +64,48 @@ def process_track(track, playlist_id, time_range, track_info_list):
         'recommended_track_artist': recommended_tracks[0]['artists'][0]['name']
     })
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
 
-def add_recommendations(time_range, playlist_name, num_songs, batch_size=10):
-    # Clear the cache before proceeding
-    # cache_path = ".spotify_cache"
-    # if os.path.exists(cache_path):
-    #     os.remove(cache_path)
-
+async def add_recommendations(time_range, playlist_name, num_songs, batch_size=10):
     if time_range == 'short_term':
         time = 'Last 4 Weeks'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
     elif time_range == 'medium_term':
         time = 'Last 6 Months'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
-    elif time_range == 'long_term':
+    else:
         time = 'All Time'
-        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music From {time}')
 
-    # Render the loading page
-
+    playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From {time}')
     user_top_tracks = sp.current_user_top_tracks(limit=num_songs, time_range=time_range)
-
     track_info_list = []
 
-    for i in range(0, num_songs, batch_size):
-        batch_of_tracks = user_top_tracks['items'][i:i + batch_size]
-        recommended_tracks_batch = []
+    # Get the event loop
+    loop = asyncio.get_event_loop()
 
-        for track in batch_of_tracks:
-            recommended_tracks = get_recommendations(track['name'])[:1]
-            recommended_tracks_batch.extend(recommended_tracks)
+    async def process_tracks_async():
+        tasks = []
+        # Create a ThreadPoolExecutor
+        executor = concurrent.futures.ThreadPoolExecutor()
 
-            track_uris = [rec_track['uri'] for rec_track in recommended_tracks]
-            add_items_to_playlist(playlist_id, track_uris)
+        for i in range(0, num_songs, batch_size):
+            batch_of_tracks = user_top_tracks['items'][i:i + batch_size]
 
-            track_info_list.append({
-                'top_track_name': track['name'],
-                'top_track_artist': track['artists'][0]['name'],
-                'recommended_track_name': recommended_tracks[0]['name'],
-                'recommended_track_artist': recommended_tracks[0]['artists'][0]['name']
-            })
+            for track in batch_of_tracks:
+                task = loop.run_in_executor(executor, process_track, track, playlist_id, time_range, track_info_list)
+                tasks.append(task)
 
-        if len(track_info_list) != i + batch_size:
-            loading_page = f'{time_range}_loading.html'
-            return render_template(loading_page)
+            await asyncio.gather(*tasks)
+
+    
+
+    await process_tracks_async()
 
     if time_range == 'short_term':
-        # Render the short_term.html template and pass track_info_list to it
         return render_template('short_term.html', track_info_list=track_info_list)
     elif time_range == 'medium_term':
         return render_template('medium_term.html', track_info_list=track_info_list)
-    elif time_range == 'long_term':
+    else:
         return render_template('long_term.html', track_info_list=track_info_list)
 
-    return render_template(f'{time_range}.html', track_info_list=track_info_list)
+
 
 # def add_recommendations(time_range, playlist_name, num_songs):
 #     # Clear the cache before proceeding
@@ -217,32 +209,27 @@ def callback():
 
 
 @app.route('/last_4_weeks')
-def last_4_weeks():
-    # Retrieve playlist_name and num_songs from the session
+async def last_4_weeks():
     playlist_name = session.get('playlist_name')
     num_songs = session.get('num_songs')
 
-    # Call add_recommendations with the retrieved values
-    return add_recommendations('short_term', playlist_name, num_songs)
-
+    return await add_recommendations('short_term', playlist_name, num_songs)
 
 @app.route('/last_6_months')
-def last_6_months():
-    # Retrieve playlist_name and num_songs from the session
+async def last_6_months():
     playlist_name = session.get('playlist_name')
     num_songs = session.get('num_songs')
 
-    # Call add_recommendations with the retrieved values
-    return add_recommendations('medium_term', playlist_name, num_songs)
+    return await add_recommendations('medium_term', playlist_name, num_songs)
 
 @app.route('/all_time')
-def all_time():
-    # Retrieve playlist_name and num_songs from the session
+async def all_time():
     playlist_name = session.get('playlist_name')
     num_songs = session.get('num_songs')
 
-    # Call add_recommendations with the retrieved values
-    return add_recommendations('long_term', playlist_name, num_songs)
+    return await add_recommendations('long_term', playlist_name, num_songs)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

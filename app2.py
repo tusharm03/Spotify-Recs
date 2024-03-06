@@ -55,21 +55,12 @@ def add_recommendations(time_range, playlist_name, num_songs, playlist_id=None):
         #     os.remove(cache_path)
         if time_range == 'short_term':
             time = 'Last 4 Weeks'
-            if playlist_id is None:
-                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
-                session['playlist_id'] = playlist_id
-
         elif time_range == 'medium_term':
             time = 'Last 6 Months'
-            if playlist_id is None:
-                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From The {time}')
-                session['playlist_id'] = playlist_id
-        elif time_range == 'long_term':
+        else:
             time = 'All Time'
-            if playlist_id is None:
-                playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music From {time}')
-                session['playlist_id'] = playlist_id
-            
+
+        playlist_id = create_playlist(playlist_name, is_public=False, description=f'Playlist Created Based On Your Music Listened To From {time}')
 
         
 
@@ -89,14 +80,6 @@ def add_recommendations(time_range, playlist_name, num_songs, playlist_id=None):
                 'recommended_track_name': recommended_tracks[0]['name'],
                 'recommended_track_artist': recommended_tracks[0]['artists'][0]['name']
             })
-        if time_range == 'short_term':
-            # Render the short_term.html template and pass track_info_list to it
-            return render_template('short_term.html', track_info_list=track_info_list) 
-        elif time_range == 'medium_term':
-            return render_template('medium_term.html', track_info_list=track_info_list) 
-        elif time_range == 'long_term':
-            return render_template('long_term.html', track_info_list=track_info_list) 
-
 
         return render_template(f'{time_range}.html', track_info_list=track_info_list)
     
